@@ -12,6 +12,12 @@ Two Docker configuration files are required for deployment:
 
 
 ## Commands
+Create Docker network
+
+```bash
+docker network create demo_net --driver bridge
+```
+
 
 Open a terminal **in the root folder**, then run:
 
