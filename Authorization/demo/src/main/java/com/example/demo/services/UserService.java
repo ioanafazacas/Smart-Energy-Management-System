@@ -72,12 +72,8 @@ public class UserService {
         User user = userOptional.get();
 
         // Actualizam câmpurile
-        if (userDetailsDTO.getUsername() != null) user.setFirstName(userDetailsDTO.getUsername());
-        if (userDetailsDTO.getPassword() != null) user.setLastName(userDetailsDTO.getPassword());
-        if (userDetailsDTO.getEmail() != null) user.setUsername(userDetailsDTO.getEmail());
-        if (userDetailsDTO.getPhoneNumber() != null) user.setPassword(userDetailsDTO.getPhoneNumber());
-        if (userDetailsDTO.getAddress() != null) user.setAddress(userDetailsDTO.getAddress());
-        if (userDetailsDTO.getBirthDate() != null) user.setBirthDate(userDetailsDTO.getBirthDate());
+        if (userDetailsDTO.getUsername() != null) user.setUsername(userDetailsDTO.getUsername());
+        if (userDetailsDTO.getPassword() != null) user.setPassword(userDetailsDTO.getPassword());
 
 
         User updatedUser = userRepository.save(user);

@@ -1,7 +1,9 @@
 package com.example.demo.dtos.builders;
 
+import com.example.demo.dtos.RoleDTO;
 import com.example.demo.dtos.UserDTO;
 import com.example.demo.dtos.UserDetailsDTO;
+import com.example.demo.entities.Role;
 import com.example.demo.entities.User;
 
 public class UserBuilder {
@@ -17,13 +19,13 @@ public class UserBuilder {
         return new UserDetailsDTO(user.getUser_id(),
                 user.getUsername(),
                 user.getPassword(),
-                user.getRole());
+                new RoleDTO(user.getRole().getRole_id(), user.getRole().getRole_name()));
     }
 
     public static User toEntity(UserDetailsDTO userDetailsDTO) {
         return new User(userDetailsDTO.getUsername(),
                 userDetailsDTO.getPassword(),
-                userDetailsDTO.getRole());
+                new Role(userDetailsDTO.getRole().getRole_id(), userDetailsDTO.getRole().getRole_name()));
 
     }
 }

@@ -14,13 +14,14 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/auth")
 @Validated
-public class UserController {
+public class AuthentificationController {
+    //am nevoie de metode de login si register ...
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public AuthentificationController(UserService userService) {
         this.userService = userService;
     }
 

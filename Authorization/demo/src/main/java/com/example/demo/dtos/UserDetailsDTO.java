@@ -16,20 +16,20 @@ public class UserDetailsDTO {
     @NotBlank(message = "password is required")
     private String password;
     @NotBlank(message = "roleId is required")
-    private Role role;
+    private RoleDTO role;
 
 
 
     public UserDetailsDTO() {
     }
 
-    public UserDetailsDTO(String username, String password, Role role) {
+    public UserDetailsDTO(String username, String password, RoleDTO role) {
         this.username = username;
         this.password = password;
         this.role = role;
     }
 
-    public UserDetailsDTO(UUID userId, String username, String password, Role role) {
+    public UserDetailsDTO(UUID userId, String username, String password, RoleDTO role) {
         this.user_id = user_id;
         this.username = username;
         this.password = password;
@@ -61,11 +61,11 @@ public class UserDetailsDTO {
         this.password = password;
     }
 
-    public Role getRole() {
+    public RoleDTO getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(RoleDTO role) {
         this.role = role;
     }
 

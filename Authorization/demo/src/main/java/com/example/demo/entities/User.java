@@ -28,7 +28,8 @@ public class User implements Serializable{
     @Column(name = "password", nullable = false, unique = true)
     private String password;
 
-    //trebuie adaugata o legatura intre tabele
+    @ManyToOne
+    @JoinColumn(name = "role_id") // cheia străină în tabelul user
     private Role role;
 
 

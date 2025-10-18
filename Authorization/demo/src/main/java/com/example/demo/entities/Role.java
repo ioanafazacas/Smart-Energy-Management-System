@@ -1,9 +1,20 @@
 package com.example.demo.entities;
 
+import jakarta.persistence.*;
+
+import java.util.List;
+
+@Entity
+@Table(name = "role")
 public class Role {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int role_id;
     private String role_name;
+    @OneToMany(mappedBy = "role")
+    private List<User> users;
 
+    public Role() {}
     public Role(String role_name){
         this.role_name = role_name;
     }
