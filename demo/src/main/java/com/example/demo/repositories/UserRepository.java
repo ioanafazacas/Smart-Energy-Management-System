@@ -1,6 +1,6 @@
 package com.example.demo.repositories;
 
-import com.example.demo.entities.Person;
+import com.example.demo.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,20 +9,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface PersonRepository extends JpaRepository<Person, UUID> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
     /**
      * Example: JPA generate query by existing field
      */
-    List<Person> findByName(String name);
+    List<User> findByFirstName(String firstName);
 
     /**
      * Example: Custom query
-     */
+
     @Query(value = "SELECT p " +
-            "FROM Person p " +
+            "FROM User p " +
             "WHERE p.name = :name " +
             "AND p.age >= 60  ")
-    Optional<Person> findSeniorsByName(@Param("name") String name);
-
+    Optional<User> findSeniorsByName(@Param("name") String name);
+*/
 }

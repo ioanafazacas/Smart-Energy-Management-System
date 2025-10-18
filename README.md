@@ -91,7 +91,7 @@ All important settings are in `src/main/resources/application.properties`. You c
 | DB port | `database.port` | `DB_PORT` | `5432` |
 | DB user | `database.user` | `DB_USER` | `postgres` |
 | DB password | `database.password` | `DB_PASSWORD` | `root` |
-| DB name | `database.name` | `DB_DBNAME` | `example-db` |
+| DB firstName | `database.firstName` | `DB_DBNAME` | `example-db` |
 | HTTP port | `server.port` | `PORT` | `8080` |
 
 Effective JDBC URL:
@@ -121,7 +121,7 @@ The app will start on: **http://localhost:8080** (unless you changed `PORT`).
 The included Postman collection targets the **people** resource defined by the **Person** entity.
 Examples once the app is running:
 - `GET /people` — list all
-- `POST /people` — create (body: JSON person)
+- `POST /people` — create (body: JSON user)
 - `GET /people/{personId}` — fetch one
 - `PUT /people/{personId}` — update
 - `DELETE /people/{personId}` — delete
