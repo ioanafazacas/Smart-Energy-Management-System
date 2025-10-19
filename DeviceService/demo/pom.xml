@@ -14,7 +14,7 @@
 	<groupId>com.example</groupId>
 	<artifactId>demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>authorizationService</name>
+	<name>deviceService</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
