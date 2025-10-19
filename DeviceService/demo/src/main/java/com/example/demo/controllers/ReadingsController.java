@@ -41,8 +41,8 @@ public class ReadingsController {
         return ResponseEntity.created(location).build(); // 201 + Location header
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<List<ReadingDTO>> getReadingsByDevice(@PathVariable DeviceDTO deviceDTO) {
+    @GetMapping("/device")
+    public ResponseEntity<List<ReadingDTO>> getReadingsByDevice(@RequestBody DeviceDTO deviceDTO) {
         return ResponseEntity.ok(readingsService.findReadingsByDevice(DeviceBuilder.toEntity(deviceDTO)));
     }
 
@@ -52,8 +52,8 @@ public class ReadingsController {
         return ResponseEntity.noContent().build(); // HTTP 204
     }
 
-    @DeleteMapping("/device/{id}")
-    public ResponseEntity<Void> deleteReadingsByDevice(@PathVariable DeviceDTO deviceDTO) {
+    @DeleteMapping("/device/")
+    public ResponseEntity<Void> deleteReadingsByDevice(@RequestBody DeviceDTO deviceDTO) {
         readingsService.deleteByDevice(DeviceBuilder.toEntity(deviceDTO));
         return ResponseEntity.noContent().build(); // HTTP 204
     }

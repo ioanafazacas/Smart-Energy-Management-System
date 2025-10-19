@@ -1,8 +1,10 @@
 package com.example.demo.services;
 
 
+import com.example.demo.config.JwtUtil;
 import com.example.demo.dtos.UserDTO;
 import com.example.demo.dtos.UserDetailsDTO;
+import com.example.demo.dtos.builders.LoginRequestDTO;
 import com.example.demo.dtos.builders.UserBuilder;
 import com.example.demo.entities.User;
 import com.example.demo.handlers.exceptions.model.ResourceNotFoundException;
@@ -11,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,66 +24,40 @@ import java.util.stream.Collectors;
 public class UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
-    //findAll
-    public List<UserDTO> findUsers() {
-        List<User> userList = userRepository.findAll();
-        return userList.stream()
-                .map(UserBuilder::toUserDTO)
-                .collect(Collectors.toList());
-    }
-
-    public UserDetailsDTO findUserById(UUID id) {
-        Optional<User> prosumerOptional = userRepository.findById(id);
-        if (!prosumerOptional.isPresent()) {
-            LOGGER.error("User with id {} was not found in db", id);
-            throw new ResourceNotFoundException(User.class.getSimpleName() + " with id: " + id);
-        }
-        return UserBuilder.toUserDetailsDTO(prosumerOptional.get());
-    }
-
-    public UUID insert(UserDetailsDTO userDTO) {
+    public UUID register(UserDetailsDTO userDTO) {
         User user = UserBuilder.toEntity(userDTO);
         user = userRepository.save(user);
         LOGGER.debug("User with id {} was inserted in db", user.getUser_id());
         return user.getUser_id();
     }
 
-    public void deleteById(UUID id) {
-        if (!userRepository.existsById(id)) {
-            LOGGER.error("User with id {} was not found in db", id);
-            throw new ResourceNotFoundException(User.class.getSimpleName() + " with id: " + id);
+    public String login(LoginRequestDTO dto) {
+        User user = userRepository.findByUsernameAndPassword(dto.getUsername(), dto.getPassword())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
         }
 
-        userRepository.deleteById(id);
-        LOGGER.info("User with id {} has been deleted successfully", id);
+        return jwtUtil.generateToken(user.getUsername());
     }
 
-    public UserDetailsDTO updateUser(UUID id, UserDetailsDTO userDetailsDTO) {
-        Optional<User> userOptional = userRepository.findById(id);
-
-        if (userOptional.isEmpty()) {
-            LOGGER.error("User with id {} not found", id);
-            throw new ResourceNotFoundException("User with id: " + id + " not found");
+    public UserDTO getUserByUsername(String username) {
+        Optional<User> prosumerOptional = userRepository.findByUsername(username);
+        if (!prosumerOptional.isPresent()) {
+            LOGGER.error("User with username {} was not found in db", username);
+            throw new ResourceNotFoundException(User.class.getSimpleName() + " with username: " + username);
         }
-
-        User user = userOptional.get();
-
-        // Actualizam câmpurile
-        if (userDetailsDTO.getUsername() != null) user.setUsername(userDetailsDTO.getUsername());
-        if (userDetailsDTO.getPassword() != null) user.setPassword(userDetailsDTO.getPassword());
-
-
-        User updatedUser = userRepository.save(user);
-
-        LOGGER.info("User with id {} was updated successfully", id);
-
-        return UserBuilder.toUserDetailsDTO(updatedUser);
+        return UserBuilder.toUserDTO(prosumerOptional.get());
     }
-
 }

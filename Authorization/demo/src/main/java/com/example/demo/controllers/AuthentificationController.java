@@ -2,37 +2,32 @@ package com.example.demo.controllers;
 
 import com.example.demo.dtos.UserDTO;
 import com.example.demo.dtos.UserDetailsDTO;
+import com.example.demo.dtos.builders.LoginRequestDTO;
 import com.example.demo.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
 @Validated
 public class AuthentificationController {
-    //am nevoie de metode de login si register ...
-
     private final UserService userService;
 
     public AuthentificationController(UserService userService) {
         this.userService = userService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserDTO>> getPeople() {
-        return ResponseEntity.ok(userService.findUsers());
-    }
 
-    @PostMapping
-    public ResponseEntity<Void> create(@Valid @RequestBody UserDetailsDTO user) {
-        UUID id = userService.insert(user);
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@Valid @RequestBody UserDetailsDTO user) {
+        UUID id = userService.register(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -41,27 +36,20 @@ public class AuthentificationController {
         return ResponseEntity.created(location).build(); // 201 + Location header
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDetailsDTO> getUser(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.findUserById(id));
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequestDTO dto) {
+        System.out.println("login???");
+        System.out.println(dto);
+        String jwt = userService.login(dto);
+        return ResponseEntity.ok(jwt);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        return ResponseEntity.ok(userService.findUsers());
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
+        String username = authentication.getName();
+        System.out.println(username);
+        UserDTO userDto = userService.getUserByUsername(username);
+        return ResponseEntity.ok(userDto);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
-        userService.deleteById(id);
-        return ResponseEntity.noContent().build(); // HTTP 204
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDetailsDTO> updateUser(@PathVariable UUID id,
-        @RequestBody UserDetailsDTO userDetailsDTO) {
-
-            UserDetailsDTO updatedUser = userService.updateUser(id, userDetailsDTO);
-            return ResponseEntity.ok(updatedUser);
-    }
 }
