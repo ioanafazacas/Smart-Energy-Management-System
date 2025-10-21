@@ -53,6 +53,16 @@ public class User implements Serializable{
         this.birthDate = birthDate;
     }
 
+    public User(UUID user_id, String firstName, String lastName, String email, String phoneNumber, String address, LocalDate birthDate) {
+        this.user_id = user_id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.birthDate = birthDate;
+    }
+
     public UUID getUser_id() {
         return user_id;
     }
