@@ -4,6 +4,7 @@ public class RoleDTO {
     private int  role_id;
     private String role_name;
 
+    public RoleDTO(){}
     public RoleDTO(String role_name){
         this.role_name = role_name;
     }
