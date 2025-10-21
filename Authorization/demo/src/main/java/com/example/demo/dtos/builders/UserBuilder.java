@@ -19,7 +19,7 @@ public class UserBuilder {
         return new UserDetailsDTO(user.getUser_id(),
                 user.getUsername(),
                 user.getPassword(),
-                new RoleDTO(user.getRole().getRole_id(), user.getRole().getRole_name()));
+                new RoleDTO(user.getRole().getRole_id(), user.getRole().getRoleName()));
     }
 
     public static User toEntity(UserDetailsDTO userDetailsDTO) {

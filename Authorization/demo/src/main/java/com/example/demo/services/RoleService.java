@@ -69,7 +69,7 @@ public class RoleService {
         Role role = roleOptional.get();
 
         // Actualizam câmpurile
-        if (roleDTO.getRole_name() != null) role.setRole_name(roleDTO.getRole_name());
+        if (roleDTO.getRole_name() != null) role.setRoleName(roleDTO.getRole_name());
 
         Role updateRole = roleRepository.save(role);
 

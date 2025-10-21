@@ -11,14 +11,8 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    /**
-     * Example: JPA generate query by existing field
-     */
-    List<User> findByFirstName(String firstName);
 
     Optional<User> findByUsernameAndPassword(String username, String password);
-
-    User findByUsername(String username);
 
     Optional<User> findByUsername(String username);
 

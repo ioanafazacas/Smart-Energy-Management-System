@@ -10,7 +10,7 @@ public class RoleBuilder {
     }
 
     public static RoleDTO toRoleDTO(Role role) {
-        return new RoleDTO(role.getRole_id(), role.getRole_name());
+        return new RoleDTO(role.getRole_id(), role.getRoleName());
     }
 
     public static Role toEntity(RoleDTO roleDTO) {

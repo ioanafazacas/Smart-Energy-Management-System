@@ -15,7 +15,6 @@ public class UserDetailsDTO {
     private String username;
     @NotBlank(message = "password is required")
     private String password;
-    @NotBlank(message = "roleId is required")
     private RoleDTO role;
 
 
