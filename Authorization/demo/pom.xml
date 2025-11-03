@@ -109,7 +109,7 @@
 		<pluginRepository>
 			<id>spring-snapshots</id>
 			<url>https://repo.spring.io/snapshot</url>
-			<releases><enabled>false</enabled></releases>
+			<releases><enabled>true</enabled></releases>
 			<snapshots><enabled>true</enabled></snapshots>
 		</pluginRepository>
 		<pluginRepository>

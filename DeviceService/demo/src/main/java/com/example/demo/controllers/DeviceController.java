@@ -36,6 +36,7 @@ public class DeviceController {
                 .path("/{id}")
                 .buildAndExpand(id)
                 .toUri();
+        System.out.println(deviceDTO);
         return ResponseEntity.created(location).build(); // 201 + Location header
     }
 
