@@ -1,0 +1,116 @@
+version: '3'
+
+services:
+  # =====================
+  # DATABASES
+  # =====================
+
+  db_user:
+    image: postgres:15
+    container_name: db_user
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: SQLPostgres32
+      POSTGRES_DB: user_management
+    ports:
+      - "5433:5432"
+    volumes:
+      - user_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  db_device:
+    image: postgres:15
+    container_name: db_device
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: SQLPostgres32
+      POSTGRES_DB: device
+    ports:
+      - "5434:5432"
+    volumes:
+      - device_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  db_auth:
+    image: postgres:15
+    container_name: db_auth
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: SQLPostgres32
+      POSTGRES_DB: authentication
+    ports:
+      - "5435:5432"
+    volumes:
+      - auth_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  # =====================
+  # MICROSERVICES
+  # =====================
+
+  user_management:
+    build:
+      context: ./userManagement/demo
+      dockerfile: Dockerfile
+    container_name: user_management
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db_user:5432/user_management
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: SQLPostgres32
+    depends_on:
+      - db_user
+    networks:
+      - app_network
+
+  device:
+    build:
+      context: ./DeviceService/demo
+      dockerfile: Dockerfile
+    container_name: device
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db_device:5432/device
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: SQLPostgres32
+    depends_on:
+      - db_device
+    networks:
+      - app_network
+
+  authentication:
+    build:
+      context: ./Authorization/demo
+      dockerfile: Dockerfile
+    container_name: authentication
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db_auth:5432/authentication
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: SQLPostgres32
+    depends_on:
+      - db_auth
+    networks:
+      - app_network
+
+# =====================
+# VOLUMES & NETWORK
+# =====================
+
+volumes:
+  user_data:
+  device_data:
+  auth_data:
+
+networks:
+  app_network:
+    driver: bridge

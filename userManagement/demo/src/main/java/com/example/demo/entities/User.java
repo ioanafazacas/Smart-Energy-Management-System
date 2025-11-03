@@ -17,8 +17,6 @@ public class User implements Serializable{
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue
-    @UuidGenerator
     @JdbcTypeCode(SqlTypes.UUID)
     private UUID user_id;
 

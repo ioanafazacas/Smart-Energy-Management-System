@@ -7,7 +7,7 @@ Two Docker configuration files are required for deployment:
 1. [`demo/Dockerfile`](demo/Dockerfile) – specifies how to build the application image  
    - Defines the base image, dependencies, src files, and the startup command
 
-2. [`docker-compose.yml`](docker-compose.yml) – defines services (containers), environment variables, ports, volumes, and networks  
+2. [`docker-compose.yml`](../docker-compose.yml) – defines services (containers), environment variables, ports, volumes, and networks  
    - References the Docker image either by **deviceDTO** (pre-built image) or by specifying the **Dockerfile** to build it automatically
 
 
