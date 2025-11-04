@@ -137,6 +137,24 @@ services:
     networks:
       - app_network
 
+  frontend:
+    build:
+      context: ./React
+      dockerfile: Dockerfile
+    container_name: frontend
+    depends_on:
+      - authentication
+      - user_management
+      - device
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`frontend.localhost`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      - "traefik.http.routers.frontend.entrypoints=web"
+    networks:
+      - app_network
+
+
 # =====================
 # VOLUMES & NETWORK
 # =====================
