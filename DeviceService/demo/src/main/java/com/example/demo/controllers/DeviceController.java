@@ -50,7 +50,7 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.findDeviceByUser(id));
     }
 
-    @GetMapping("/")
+    @GetMapping("/all")
     public ResponseEntity<List<DeviceDTO>> getAllDevices() {
         return ResponseEntity.ok(deviceService.findDevices());
     }

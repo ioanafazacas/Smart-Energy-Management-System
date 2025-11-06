@@ -1,13 +1,23 @@
 import React, { useContext } from 'react';
-import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext.jsx';
+import { Navigate, Outlet } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
-export default function ProtectedRoute({ children, requiredRole }) {
-  const { user } = useContext(AuthContext);
+const ProtectedRoute = ({ allowedRoles }) => {
+  const { user, token } = useContext(AuthContext);
 
-  if (!user) return <Navigate to="/login" />;
-  if (requiredRole && user.role !== requiredRole)
-    return <Navigate to="/login" />;
+  console.log('🔍 ProtectedRoute:', { user, token, allowedRoles });
 
-  return children;
-}
+  if (!user || !token) {
+    console.warn('🚫 No user or token, redirecting to /');
+    return <Navigate to="/" replace />;
+  }
+
+  if (!allowedRoles.includes(user.role)) {
+    console.warn('🚫 Role not allowed, redirecting to /');
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+};
+
+export default ProtectedRoute;
