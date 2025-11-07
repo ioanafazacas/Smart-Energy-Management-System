@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
+import { deviceAPI} from '../api/devices.js';
 import { AuthContext } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import { userAPI } from '../api/users.js';
 
 export default function AdminDashboard() {
   const { token } = useContext(AuthContext);
@@ -9,11 +10,11 @@ export default function AdminDashboard() {
   const [devices, setDevices] = useState([]);
 
   useEffect(() => {
-    axios
-      .get('/users', { headers: { Authorization: `Bearer ${token}` } })
+    userAPI
+      .get('/user/all', { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => setUsers(res.data));
-    axios
-      .get('/devices', { headers: { Authorization: `Bearer ${token}` } })
+    deviceAPI
+      .get('/device/all', { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => setDevices(res.data));
   }, [token]);
 
