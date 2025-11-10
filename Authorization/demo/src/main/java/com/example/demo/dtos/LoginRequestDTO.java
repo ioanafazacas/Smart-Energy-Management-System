@@ -1,6 +1,5 @@
-package com.example.demo.dtos.builders;
+package com.example.demo.dtos;
 
-import com.example.demo.dtos.UserDTO;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.Objects;

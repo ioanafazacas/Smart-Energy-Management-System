@@ -12,12 +12,14 @@ services:
       - "--api.insecure=true"                       # Dashboard (port 8080)
       - "--providers.docker=true"                   # Descoperă automat serviciile Docker
       - "--providers.docker.exposedbydefault=false" # Expune doar containerele cu label
+      - "--providers.file.filename=/etc/traefik/path.yml" # Încarcă middlewares din fișier
       - "--entrypoints.web.address=:80"             # HTTP port 80
     ports:
       - "80:80"
       - "8080:8080"                                # Dashboard Traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Permite accesul la evenimentele Docker
+      - ./path.yml:/etc/traefik/path.yml           # ✅ montează fișierul cu middleware-ul CORS
     networks:
       - app_network
 
@@ -74,13 +76,11 @@ services:
   # MICROSERVICES
   # =====================
 
-  user_management:
+  user-management:
     build:
       context: ./userManagement/demo
       dockerfile: Dockerfile
-    container_name: user_management
-#    ports:
-#      - "8081:8081"
+    container_name: user-management
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db_user:5432/user_management
       SPRING_DATASOURCE_USERNAME: postgres
@@ -92,6 +92,7 @@ services:
       - "traefik.http.routers.user.rule=Host(`user.localhost`)"
       - "traefik.http.services.user.loadbalancer.server.port=8080"
       - "traefik.http.routers.user.entrypoints=web"
+      - "traefik.http.routers.user.middlewares=cors@file"   # ✅ CORS activat
     networks:
       - app_network
 
@@ -100,8 +101,6 @@ services:
       context: ./DeviceService/demo
       dockerfile: Dockerfile
     container_name: device
-#    ports:
-#      - "8082:8082"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db_device:5432/device
       SPRING_DATASOURCE_USERNAME: postgres
@@ -113,6 +112,7 @@ services:
       - "traefik.http.routers.device.rule=Host(`device.localhost`)"
       - "traefik.http.services.device.loadbalancer.server.port=8080"
       - "traefik.http.routers.device.entrypoints=web"
+      - "traefik.http.routers.device.middlewares=cors@file" # ✅ CORS activat
     networks:
       - app_network
 
@@ -121,8 +121,6 @@ services:
       context: ./Authorization/demo
       dockerfile: Dockerfile
     container_name: authentication
-#    ports:
-#      - "8083:8083"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db_auth:5432/authentication
       SPRING_DATASOURCE_USERNAME: postgres
@@ -134,6 +132,7 @@ services:
       - "traefik.http.routers.auth.rule=Host(`auth.localhost`)"
       - "traefik.http.services.auth.loadbalancer.server.port=8080"
       - "traefik.http.routers.auth.entrypoints=web"
+      - "traefik.http.routers.auth.middlewares=cors@file"   # ✅ CORS activat
     networks:
       - app_network
 
@@ -146,18 +145,19 @@ services:
       - "3000:3000"
     depends_on:
       - authentication
-      - user_management
+      - user-management
       - device
     volumes:
-      - ./React:/app           # 🔥 montează codul tău local
-      - /app/node_modules         # evită suprascrierea node_modules din container
+      - ./React:/app
+      - /app/node_modules
     environment:
-       - CHOKIDAR_USEPOLLING=true  # necesar pentru live reload în Docker
+      - CHOKIDAR_USEPOLLING=true
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`frontend.localhost`)"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.middlewares=cors@file" # ✅ CORS activat și pe frontend
     networks:
       - app_network
 
@@ -174,12 +174,3 @@ volumes:
 networks:
   app_network:
     driver: bridge
-
-#frontend:
-#  build:
-#    context: ./React
-#    dockerfile: Dockerfile
-#  ports:
-#    - "3000:3000"
-#  networks:
-#    - app_network

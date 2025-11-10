@@ -1,24 +1,50 @@
 package com.example.demo.dtos;
 
+
+import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
-public class UserDetailsDTO {
+public class RegistrationRequestDTO {
 
-    private UUID id;
+    private UUID user_id;
+
+    @NotBlank(message = "username is required")
     private String username;
+    @NotBlank(message = "password is required")
+    private String password;
     private RoleDTO role;
+
+    @NotBlank(message = "firstName is required")
     private String firstName;
+    @NotBlank(message = "lastName is required")
     private String lastName;
+    @NotBlank(message = "email is required")
     private String email;
+    @NotBlank(message = "phone number is required")
     private String phoneNumber;
+    @NotBlank(message = "address is required")
     private String address;
     private LocalDate birthDate;
 
-    public UserDetailsDTO(UUID id, String username, RoleDTO role, String firstName, String lastName, String email, String phoneNumber, String address, LocalDate birthDate) {
-        this.id = id;
+
+
+    public RegistrationRequestDTO() {
+    }
+
+    public RegistrationRequestDTO(RoleDTO role,  String username,String password, UUID user_id) {
+        this.role = role;
+        this.password = password;
         this.username = username;
+        this.user_id = user_id;
+    }
+
+    public RegistrationRequestDTO(UUID user_id, String username, String password, RoleDTO role, String firstName, String lastName, String email, String phoneNumber, String address, LocalDate birthDate) {
+        this.user_id = user_id;
+        this.username = username;
+        this.password = password;
         this.role = role;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -28,9 +54,9 @@ public class UserDetailsDTO {
         this.birthDate = birthDate;
     }
 
-
-    public UserDetailsDTO( String username, RoleDTO role, String firstName, String lastName, String email, String phoneNumber, String address, LocalDate birthDate) {
+    public RegistrationRequestDTO(String username, String password, RoleDTO role, String firstName, String lastName, String email, String phoneNumber, String address, LocalDate birthDate) {
         this.username = username;
+        this.password = password;
         this.role = role;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -40,12 +66,12 @@ public class UserDetailsDTO {
         this.birthDate = birthDate;
     }
 
-    public UUID getId() {
-        return id;
+    public UUID getUser_id() {
+        return user_id;
     }
 
-    public void setId(UUID id) {
-        this.id = id;
+    public void setUser_id(UUID user_id) {
+        this.user_id = user_id;
     }
 
     public String getUsername() {
@@ -54,6 +80,14 @@ public class UserDetailsDTO {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public RoleDTO getRole() {
@@ -116,8 +150,9 @@ public class UserDetailsDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UserDetailsDTO that = (UserDetailsDTO) o;
+        RegistrationRequestDTO that = (RegistrationRequestDTO) o;
         return Objects.equals(username, that.username) &&
+                Objects.equals(password, that.password) &&
                 Objects.equals(firstName, that.firstName) &&
                 Objects.equals(lastName, that.lastName) &&
                 Objects.equals(phoneNumber, that.phoneNumber) &&
@@ -129,6 +164,6 @@ public class UserDetailsDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, firstName, lastName, email, phoneNumber, address, birthDate);
+        return Objects.hash(username, password, firstName, lastName, email, phoneNumber, address, birthDate);
     }
 }

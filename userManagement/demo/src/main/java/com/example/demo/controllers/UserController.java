@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getPeople() {
+    public ResponseEntity<List<UserDetailsDTO>> getPeople() {
         return ResponseEntity.ok(userService.findUsers());
     }
 
@@ -45,8 +45,8 @@ public class UserController {
         return ResponseEntity.ok(userService.findUserById(id));
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
+    @GetMapping("/all")
+    public ResponseEntity<List<UserDetailsDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.findUsers());
     }
 

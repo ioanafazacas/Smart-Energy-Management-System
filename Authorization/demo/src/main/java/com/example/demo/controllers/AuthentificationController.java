@@ -1,9 +1,6 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dtos.LoginResponseDTO;
-import com.example.demo.dtos.UserDTO;
-import com.example.demo.dtos.UserDetailsDTO;
-import com.example.demo.dtos.builders.LoginRequestDTO;
+import com.example.demo.dtos.*;
 import com.example.demo.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -27,15 +24,16 @@ public class AuthentificationController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@Valid @RequestBody UserDetailsDTO user) {
+    public ResponseEntity<UserDetailsDTO> register(@Valid @RequestBody RegistrationRequestDTO user) {
         UUID id = userService.register(user);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(id)
-                .toUri();
-        return ResponseEntity.created(location).build(); // 201 + Location header
+        UserDetailsDTO dto = userService.
+                getUserById(id);
+        if (dto == null) {
+            return ResponseEntity.internalServerError().build();
+        }
+        return ResponseEntity.ok(dto);
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {

@@ -30,10 +30,10 @@ public class UserService {
     }
 
     //findAll
-    public List<UserDTO> findUsers() {
+    public List<UserDetailsDTO> findUsers() {
         List<User> userList = userRepository.findAll();
         return userList.stream()
-                .map(UserBuilder::toUserDTO)
+                .map(UserBuilder::toUserDetailsDTO)
                 .collect(Collectors.toList());
     }
 

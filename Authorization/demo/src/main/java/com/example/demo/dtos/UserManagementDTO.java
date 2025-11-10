@@ -1,25 +1,39 @@
 package com.example.demo.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
-public class UserDetailsDTO {
+public class UserManagementDTO {
 
-    private UUID id;
-    private String username;
-    private RoleDTO role;
+    private UUID user_id;
     private String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
     private String address;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 
-    public UserDetailsDTO(UUID id, String username, RoleDTO role, String firstName, String lastName, String email, String phoneNumber, String address, LocalDate birthDate) {
-        this.id = id;
-        this.username = username;
-        this.role = role;
+
+    public UserManagementDTO() {
+    }
+
+    public UserManagementDTO(String firstName, String lastName, String email, String phoneNumber, String address, LocalDate birthDate) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.birthDate = birthDate;
+    }
+
+    public UserManagementDTO(UUID user_id, String firstName, String lastName, String email, String phoneNumber, String address, LocalDate birthDate) {
+        this.user_id = user_id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -29,39 +43,21 @@ public class UserDetailsDTO {
     }
 
 
-    public UserDetailsDTO( String username, RoleDTO role, String firstName, String lastName, String email, String phoneNumber, String address, LocalDate birthDate) {
-        this.username = username;
-        this.role = role;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
+    public UUID getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(UUID user_id) {
+        this.user_id = user_id;
+    }
+
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
         this.address = address;
-        this.birthDate = birthDate;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public RoleDTO getRole() {
-        return role;
-    }
-
-    public void setRole(RoleDTO role) {
-        this.role = role;
     }
 
     public String getFirstName() {
@@ -96,14 +92,6 @@ public class UserDetailsDTO {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public LocalDate getBirthDate() {
         return birthDate;
     }
@@ -116,19 +104,17 @@ public class UserDetailsDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UserDetailsDTO that = (UserDetailsDTO) o;
-        return Objects.equals(username, that.username) &&
-                Objects.equals(firstName, that.firstName) &&
+        UserManagementDTO that = (UserManagementDTO) o;
+        return Objects.equals(firstName, that.firstName) &&
                 Objects.equals(lastName, that.lastName) &&
+                Objects.equals(email, that.email) &&
                 Objects.equals(phoneNumber, that.phoneNumber) &&
                 Objects.equals(address, that.address) &&
-                Objects.equals(email, that.email) &&
-                Objects.equals(birthDate, that.birthDate)
-                ;
+                Objects.equals(birthDate, that.birthDate) ; //oare aici ar trebui altceva?
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, firstName, lastName, email, phoneNumber, address, birthDate);
+        return Objects.hash(firstName, lastName, email, phoneNumber, address, birthDate);
     }
 }

@@ -1,6 +1,8 @@
 package com.example.demo.dtos;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
@@ -9,6 +11,7 @@ import java.util.UUID;
 
 public class UserDetailsDTO {
 
+    @JsonProperty("user_id")
     private UUID user_id;
 
     @NotBlank(message = "first_name is required")
@@ -21,7 +24,7 @@ public class UserDetailsDTO {
     private String phoneNumber;
     @NotBlank(message = "address is required")
     private String address;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 
 
