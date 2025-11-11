@@ -8,6 +8,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.net.URI;
 import java.util.UUID;
@@ -15,6 +21,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/auth")
 @Validated
+@Tag(name = "Authentication API", description = "Autentificare, înregistrare și gestionarea utilizatorilor în serviciul Auth")
 public class AuthentificationController {
     private final UserService userService;
 
@@ -22,7 +29,12 @@ public class AuthentificationController {
         this.userService = userService;
     }
 
-
+    @Operation(summary = "Înregistrează un utilizator nou", description = "Creează un nou cont de utilizator în sistemul de autentificare.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Utilizator înregistrat cu succes",
+                    content = @Content(schema = @Schema(implementation = UserDetailsDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Date de înregistrare invalide")
+    })
     @PostMapping("/register")
     public ResponseEntity<UserDetailsDTO> register(@Valid @RequestBody RegistrationRequestDTO user) {
         UUID id = userService.register(user);
@@ -34,7 +46,12 @@ public class AuthentificationController {
         return ResponseEntity.ok(dto);
     }
 
-
+    @Operation(summary = "Autentificare utilizator", description = "Returnează un token JWT și detaliile utilizatorului.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Autentificare reușită",
+                    content = @Content(schema = @Schema(implementation = LoginResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Autentificare eșuată")
+    })
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO dto) {
 //        System.out.println("login???");
@@ -48,6 +65,7 @@ public class AuthentificationController {
         return ResponseEntity.ok(loginResponseDTO);
     }
 
+    @Operation(summary = "Obține detaliile utilizatorului curent", description = "Returnează datele utilizatorului logat curent.")
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
         String username = authentication.getName();
@@ -56,6 +74,7 @@ public class AuthentificationController {
         return ResponseEntity.ok(userDto);
     }
 
+    @Operation(summary = "Șterge un utilizator", description = "Șterge un utilizator din sistemul de autentificare.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         try {

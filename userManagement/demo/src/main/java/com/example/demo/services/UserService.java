@@ -8,7 +8,7 @@ import com.example.demo.entities.User;
 import com.example.demo.handlers.exceptions.model.ResourceNotFoundException;
 import com.example.demo.repositories.UserRepository;
 import jakarta.transaction.Transactional;
-import org.jspecify.annotations.Nullable;
+//import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,10 +68,20 @@ public class UserService {
 
             // 2️⃣ Ștergem și din AUTH microservice
             deleteUserFromAuthService(id);
-
+            deleteUserFromDevice(id);
         } catch (Exception e) {
             LOGGER.error("❌ Eroare la ștergerea userului: {}", e.getMessage());
             throw new RuntimeException("Nu s-a putut șterge complet utilizatorul");
+        }
+    }
+
+    private void deleteUserFromDevice(UUID id) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.delete("http://device:8080/device/user/" + id);
+            System.out.println("✅ Device-urile asociate au fost șterse din device-service.");
+        } catch (Exception e) {
+            System.err.println("⚠️ Nu s-au putut șterge device-urile userului din device-service: " + e.getMessage());
         }
     }
 

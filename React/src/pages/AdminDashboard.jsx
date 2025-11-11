@@ -1,45 +1,43 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Navbar from "../components/Navbar";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import Navbar from '../components/Navbar';
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Modal state
   const [showUserModal, setShowUserModal] = useState(false);
   const [showDeviceModal, setShowDeviceModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [editingDevice, setEditingDevice] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
-
+  const [successMessage, setSuccessMessage] = useState('');
 
   const [formUser, setFormUser] = useState({
-    username: "",
-    password: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    address: "",
-    birthDate: "",
-    role: "USER",
+    username: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    address: '',
+    birthDate: '',
+    role: 'USER',
   });
 
   const [formDevice, setFormDevice] = useState({
-    name: "",
-    serialNumber: "",
-    maxConsumption: "",
+    name: '',
+    serialNumber: '',
+    maxConsumption: '',
+    userId: '',
   });
 
-  const USER_API = "http://user.localhost/user";
-  const DEVICE_API = "http://device.localhost/device";
-  const AUTH_API = "http://auth.localhost/auth";
+  const USER_API = 'http://user.localhost/user';
+  const DEVICE_API = 'http://device.localhost/device';
+  const AUTH_API = 'http://auth.localhost/auth';
 
-  // -------------------------------
-  // FETCH DATA INITIALLY
-  // -------------------------------
+  // =============================
+  // FETCH INITIAL DATA
+  // =============================
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -50,14 +48,12 @@ export default function AdminDashboard() {
         setUsers(
           usersRes.data.map((u) => ({
             ...u,
-            id: u.id || u.user_id, // normalizează ID-ul
+            id: u.id || u.user_id,
           })),
         );
-
-        //setUsers(usersRes.data);
         setDevices(devicesRes.data);
       } catch (err) {
-        console.error("❌ Eroare la fetch:", err);
+        console.error('❌ Eroare la fetch:', err);
       } finally {
         setLoading(false);
       }
@@ -65,23 +61,23 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
-  // -------------------------------
+  // =============================
   // USERS CRUD
-  // -------------------------------
+  // =============================
   const openUserModal = (user = null) => {
     setEditingUser(user);
     setFormUser(
       user || {
-        username: "",
-        password: "",
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        address: "",
-        birthDate: "",
-        role: "USER",
-      }
+        username: '',
+        password: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        phoneNumber: '',
+        address: '',
+        birthDate: '',
+        role: 'USER',
+      },
     );
     setShowUserModal(true);
   };
@@ -90,71 +86,58 @@ export default function AdminDashboard() {
     e.preventDefault();
     try {
       if (editingUser) {
-        // UPDATE
         const userId = editingUser.id || editingUser.user_id;
         const res = await axios.put(`${USER_API}/${userId}`, formUser);
-
         setUsers(users.map((u) => (u.id === editingUser.id ? res.data : u)));
-
-        // ✅ mesaj de succes
-        setSuccessMessage("✅ Utilizatorul a fost actualizat cu succes!");
-        setTimeout(() => setSuccessMessage(""), 3000);
-
-        setShowUserModal(false);
-
+        setSuccessMessage('✅ Utilizatorul a fost actualizat cu succes!');
       } else {
-        // CREATE
         const authRes = await axios.post(`${AUTH_API}/register`, formUser);
         const createdUser = authRes.data;
 
         if (createdUser && createdUser.id) {
-          console.log('✅ Creat în AUTH:', createdUser);
           setUsers([...users, createdUser]);
-
-          // ✅ mesaj de succes pentru creare
           setSuccessMessage('✅ Utilizatorul a fost creat cu succes!');
-          setTimeout(() => setSuccessMessage(''), 3000);
         } else {
-          console.warn("⚠️ Backendul nu a returnat un utilizator valid:", createdUser);
+          console.warn(
+            '⚠️ Backendul nu a returnat un utilizator valid:',
+            createdUser,
+          );
         }
-
-        setShowUserModal(false);
       }
+      setTimeout(() => setSuccessMessage(''), 3000);
+      setShowUserModal(false);
     } catch (err) {
-      console.error("❌ Eroare la salvare user:", err.response?.data || err.message);
+      console.error(
+        '❌ Eroare la salvare user:',
+        err.response?.data || err.message,
+      );
     }
   };
 
   const handleDeleteUser = async (id) => {
     try {
-      const userId = id || (typeof id === "object" ? id.id || id.user_id : id);
-
+      const userId = id || (typeof id === 'object' ? id.id || id.user_id : id);
       await axios.delete(`${USER_API}/${userId}`);
-
-      // 🔥 actualizează lista locală eliminând userul
       setUsers((prev) => prev.filter((u) => (u.id || u.user_id) !== userId));
-
-      // ✅ mesaj de succes pentru ștergere
-      setSuccessMessage("🗑️ Utilizatorul a fost șters cu succes!");
-      setTimeout(() => setSuccessMessage(""), 3000);
-
-      console.log(`✅ Utilizatorul cu ID ${userId} a fost șters`);
+      setSuccessMessage('🗑️ Utilizatorul a fost șters cu succes!');
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      console.error("❌ Eroare la ștergere user:", err);
+      console.error('❌ Eroare la ștergere user:', err);
     }
   };
 
-  // -------------------------------
+  // =============================
   // DEVICES CRUD
-  // -------------------------------
-  const openDeviceModal = (device = null) => {
+  // =============================
+  const openDeviceModal = (device = null, userId = null) => {
     setEditingDevice(device);
     setFormDevice(
       device || {
-        name: "",
-        serialNumber: "",
-        maxConsumption: "",
-      }
+        name: '',
+        serialNumber: '',
+        maxConsumption: '',
+        userId: userId || '',
+      },
     );
     setShowDeviceModal(true);
   };
@@ -163,15 +146,32 @@ export default function AdminDashboard() {
     e.preventDefault();
     try {
       if (editingDevice) {
-        const res = await axios.put(`${DEVICE_API}/${editingDevice.deviceId}`, formDevice);
-        setDevices(devices.map((d) => (d.deviceId === editingDevice.deviceId ? res.data : d)));
+        const res = await axios.put(
+          `${DEVICE_API}/${editingDevice.deviceId}`,
+          formDevice,
+        );
+        setDevices(
+          devices.map((d) =>
+            d.deviceId === editingDevice.deviceId ? res.data : d,
+          ),
+        );
+        setSuccessMessage('✅ Device actualizat cu succes!');
       } else {
+        if (!formDevice.userId) {
+          alert('⚠️ Selectează un utilizator pentru acest device!');
+          return;
+        }
         const res = await axios.post(`${DEVICE_API}/create`, formDevice);
         setDevices([...devices, res.data]);
+        setSuccessMessage('✅ Device adăugat cu succes!');
       }
+      setTimeout(() => setSuccessMessage(''), 3000);
       setShowDeviceModal(false);
     } catch (err) {
-      console.error("❌ Eroare la salvare device:", err);
+      console.error(
+        '❌ Eroare la salvare device:',
+        err.response?.data || err.message,
+      );
     }
   };
 
@@ -179,14 +179,16 @@ export default function AdminDashboard() {
     try {
       await axios.delete(`${DEVICE_API}/${id}`);
       setDevices(devices.filter((d) => d.deviceId !== id));
+      setSuccessMessage('🗑️ Device-ul a fost șters cu succes!');
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      console.error("❌ Eroare la ștergere device:", err);
+      console.error('❌ Eroare la ștergere device:', err);
     }
   };
 
-  // -------------------------------
-  // UI RENDERING
-  // -------------------------------
+  // =============================
+  // UI
+  // =============================
   if (loading)
     return (
       <div className="text-center mt-10 text-gray-500 text-lg">
@@ -201,6 +203,12 @@ export default function AdminDashboard() {
         <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
           Admin Dashboard
         </h1>
+
+        {successMessage && (
+          <div className="text-center mb-4 text-green-600 font-semibold">
+            {successMessage}
+          </div>
+        )}
 
         {/* USERS TABLE */}
         <div className="bg-white shadow-lg rounded-2xl p-4 mb-10">
@@ -229,7 +237,6 @@ export default function AdminDashboard() {
                 <th className="px-4 py-2 text-center">Acțiuni</th>
               </tr>
             </thead>
-
             <tbody>
               {users.map((u) => (
                 <tr
@@ -254,9 +261,15 @@ export default function AdminDashboard() {
                     </button>
                     <button
                       onClick={() => handleDeleteUser(u.id || u.user_id)}
-                      className="text-red-500 hover:text-red-600"
+                      className="text-red-500 hover:text-red-600 mr-3"
                     >
                       🗑️
+                    </button>
+                    <button
+                      onClick={() => openDeviceModal(null, u.id || u.user_id)}
+                      className="text-green-500 hover:text-green-600"
+                    >
+                      ➕ Add Device
                     </button>
                   </td>
                 </tr>
@@ -283,16 +296,17 @@ export default function AdminDashboard() {
                 <th className="px-4 py-2">Nume</th>
                 <th className="px-4 py-2">Serial Number</th>
                 <th className="px-4 py-2">Consum maxim</th>
+                <th className="px-4 py-2">User ID</th>
                 <th className="px-4 py-2 text-center">Acțiuni</th>
               </tr>
             </thead>
-
             <tbody>
               {devices.map((d) => (
                 <tr key={d.deviceId} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-2">{d.name}</td>
                   <td className="px-4 py-2">{d.serialNumber}</td>
                   <td className="px-4 py-2">{d.maxConsumption} W</td>
+                  <td className="px-4 py-2">{d.userId}</td>
                   <td className="px-4 py-2 text-center">
                     <button
                       onClick={() => openDeviceModal(d)}
@@ -313,6 +327,75 @@ export default function AdminDashboard() {
           </table>
         </div>
       </div>
+
+      {/* DEVICE MODAL */}
+      {showDeviceModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-xl w-1/3 shadow-lg">
+            <h3 className="text-xl font-semibold mb-4">
+              {editingDevice ? 'Editează device' : 'Adaugă device'}
+            </h3>
+            <form onSubmit={handleDeviceSubmit} className="grid gap-4">
+              <input
+                type="text"
+                placeholder="User ID"
+                value={formDevice.userId}
+                readOnly={!!formDevice.userId}
+                onChange={(e) =>
+                  setFormDevice({ ...formDevice, userId: e.target.value })
+                }
+                className="border p-2 rounded-md bg-gray-100"
+              />
+              <input
+                type="text"
+                placeholder="Nume device"
+                value={formDevice.name}
+                onChange={(e) =>
+                  setFormDevice({ ...formDevice, name: e.target.value })
+                }
+                className="border p-2 rounded-md"
+              />
+              <input
+                type="text"
+                placeholder="Serial Number"
+                value={formDevice.serialNumber}
+                onChange={(e) =>
+                  setFormDevice({ ...formDevice, serialNumber: e.target.value })
+                }
+                className="border p-2 rounded-md"
+              />
+              <input
+                type="number"
+                placeholder="Consum maxim"
+                value={formDevice.maxConsumption}
+                onChange={(e) =>
+                  setFormDevice({
+                    ...formDevice,
+                    maxConsumption: e.target.value,
+                  })
+                }
+                className="border p-2 rounded-md"
+              />
+              <div className="flex justify-end mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowDeviceModal(false)}
+                  className="bg-gray-300 px-4 py-2 rounded-md mr-2"
+                >
+                  Anulează
+                </button>
+                <button
+                  type="submit"
+                  className="bg-green-500 text-white px-4 py-2 rounded-md"
+                >
+                  Salvează
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* USER MODAL */}
       {showUserModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
@@ -320,12 +403,10 @@ export default function AdminDashboard() {
             <h3 className="text-xl font-semibold mb-4">
               {editingUser ? 'Editează utilizator' : 'Adaugă utilizator'}
             </h3>
-
             <form
               onSubmit={handleUserSubmit}
               className="grid grid-cols-2 gap-4"
             >
-              {/* 🔹 Username și Parolă – DOAR LA CREARE */}
               {!editingUser && (
                 <>
                   <input
@@ -338,7 +419,6 @@ export default function AdminDashboard() {
                     className="border p-2 rounded-md"
                     required
                   />
-
                   <input
                     type="password"
                     placeholder="Parolă"
@@ -352,7 +432,6 @@ export default function AdminDashboard() {
                 </>
               )}
 
-              {/* Prenume */}
               <input
                 type="text"
                 placeholder="Prenume"
@@ -362,8 +441,6 @@ export default function AdminDashboard() {
                 }
                 className="border p-2 rounded-md"
               />
-
-              {/* Nume */}
               <input
                 type="text"
                 placeholder="Nume"
@@ -373,8 +450,6 @@ export default function AdminDashboard() {
                 }
                 className="border p-2 rounded-md"
               />
-
-              {/* Email */}
               <input
                 type="email"
                 placeholder="Email"
@@ -384,8 +459,6 @@ export default function AdminDashboard() {
                 }
                 className="border p-2 rounded-md"
               />
-
-              {/* Telefon */}
               <input
                 type="text"
                 placeholder="Telefon"
@@ -395,8 +468,6 @@ export default function AdminDashboard() {
                 }
                 className="border p-2 rounded-md"
               />
-
-              {/* Adresă */}
               <input
                 type="text"
                 placeholder="Adresă"
@@ -406,8 +477,6 @@ export default function AdminDashboard() {
                 }
                 className="border p-2 rounded-md"
               />
-
-              {/* Data nașterii */}
               <input
                 type="date"
                 value={formUser.birthDate}
@@ -416,8 +485,6 @@ export default function AdminDashboard() {
                 }
                 className="border p-2 rounded-md"
               />
-
-              {/* 🔽 Select rol */}
               <select
                 value={formUser.role?.role_name || formUser.role || 'USER'}
                 onChange={(e) =>
@@ -435,7 +502,6 @@ export default function AdminDashboard() {
                 <option value="ADMIN">ADMIN</option>
               </select>
 
-              {/* Butoane */}
               <div className="col-span-2 flex justify-end mt-4">
                 <button
                   type="button"

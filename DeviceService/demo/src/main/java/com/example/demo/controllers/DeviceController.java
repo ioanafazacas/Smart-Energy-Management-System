@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.net.URI;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/device")
 @Validated
+@Tag(name = "Device Management API", description = "Operații CRUD pentru dispozitivele conectate utilizatorilor")
 public class DeviceController {
 
     private final DeviceService deviceService;
@@ -28,8 +31,9 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.findDevices());
     }
 
+    @Operation(summary = "Creează un dispozitiv nou")
     @PostMapping("/create")
-    public ResponseEntity<Void> create(@Valid @RequestBody DeviceDTO deviceDTO) {
+    public ResponseEntity<DeviceDTO> create(@Valid @RequestBody DeviceDTO deviceDTO) {
         UUID id = deviceService.insert(deviceDTO);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -37,9 +41,11 @@ public class DeviceController {
                 .buildAndExpand(id)
                 .toUri();
         System.out.println(deviceDTO);
-        return ResponseEntity.created(location).build(); // 201 + Location header
+        DeviceDTO dto = deviceService.findDeviceById(id);
+        return ResponseEntity.ok(dto); // 201 + Location header
     }
 
+    @Operation(summary = "Obține un dispozitiv după ID")
     @GetMapping("/{id}")
     public ResponseEntity<DeviceDTO> getDevice(@PathVariable UUID id) {
         return ResponseEntity.ok(deviceService.findDeviceById(id));
@@ -50,23 +56,27 @@ public class DeviceController {
         return ResponseEntity.ok(deviceService.findDeviceByUser(id));
     }
 
+    @Operation(summary = "Obține toate dispozitivele")
     @GetMapping("/all")
     public ResponseEntity<List<DeviceDTO>> getAllDevices() {
         return ResponseEntity.ok(deviceService.findDevices());
     }
 
+    @Operation(summary = "Șterge un dispozitiv")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDevice(@PathVariable UUID id) {
         deviceService.deleteById(id);
         return ResponseEntity.noContent().build(); // HTTP 204
     }
 
+    @Operation(summary = "Șterge toate dispozitivele unui utilizator")
     @DeleteMapping("/user/{id}")
     public ResponseEntity<Void> deleteDevicesByUser(@PathVariable UUID id) {
         deviceService.deleteByUserId(id);
         return ResponseEntity.noContent().build(); // HTTP 204
     }
 
+    @Operation(summary = "Actualizează un dispozitiv existent")
     @PutMapping("/{id}")
     public ResponseEntity<DeviceDTO> updateUser(@PathVariable UUID id,
                                                  @RequestBody DeviceDTO deviceDTO) {
