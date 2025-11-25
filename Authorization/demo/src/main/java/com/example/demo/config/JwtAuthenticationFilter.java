@@ -90,8 +90,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
+        // permite toate cererile OPTIONS (preflight)
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         String path = request.getServletPath();
-        // ✅ Include și slash la început, și toate endpointurile publice
+
         return path.startsWith("/auth/login")
                 || path.startsWith("/auth/register")
                 || path.startsWith("/auth/validate");

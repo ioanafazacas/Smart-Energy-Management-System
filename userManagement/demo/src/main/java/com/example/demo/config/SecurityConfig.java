@@ -37,6 +37,7 @@ public class SecurityConfig {
                 // 🔓 permitem toate cererile (pentru moment)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll() // ✅ permite crearea de user
                 );
 
         return http.build();
