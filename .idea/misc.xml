@@ -8,6 +8,7 @@
         <option value="$PROJECT_DIR$/ds2025_spring_example/demo/pom.xml" />
         <option value="$PROJECT_DIR$/DeviceService/demo/pom.xml" />
         <option value="$PROJECT_DIR$/userManagement/demo/pom.xml" />
+        <option value="$PROJECT_DIR$/MonitoringService/demo/pom.xml" />
       </list>
     </option>
   </component>
