@@ -185,4 +185,11 @@ public class MonitoringService {
     private HourlyConsumptionDTO toHourlyConsumptionDTO(HourlyEnergyConsumption consumption) {
         return new HourlyConsumptionDTO(
                 consumption.getId(),
-                consumption
+                consumption.getDeviceId(),
+                consumption.getHourTimestamp(),
+                consumption.getTotalConsumption(),
+                consumption.getMaxConsumptionThreshold(),
+                consumption.isExceeded()
+        );
+    }
+}

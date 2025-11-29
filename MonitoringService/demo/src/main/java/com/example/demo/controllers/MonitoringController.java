@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dtos.ConsumptionStatsDTO;
 import com.example.demo.dtos.DeviceMeasurementDTO;
 import com.example.demo.dtos.HourlyConsumptionDTO;
 import com.example.demo.services.MonitoringService;
