@@ -2,9 +2,11 @@ package com.example.demo.services;
 
 
 import com.example.demo.dtos.DeviceDTO;
+import com.example.demo.dtos.DeviceSyncDTO;
 import com.example.demo.dtos.builders.DeviceBuilder;
 import com.example.demo.entities.Device;
 import com.example.demo.handlers.exceptions.model.ResourceNotFoundException;
+import com.example.demo.messaging.MessageProducer;
 import com.example.demo.repositories.DeviceRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -21,10 +23,12 @@ import java.util.stream.Collectors;
 public class DeviceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeviceService.class);
     private final DeviceRepository deviceRepository;
+    private final MessageProducer messageProducer;
 
     @Autowired
-    public DeviceService(DeviceRepository deviceRepository) {
+    public DeviceService(DeviceRepository deviceRepository, MessageProducer messageProducer) {
         this.deviceRepository = deviceRepository;
+        this.messageProducer = messageProducer;
     }
 
     //findAll
@@ -56,20 +60,45 @@ public class DeviceService {
                         .collect((Collectors.toList()));
     }
 
+    @Transactional
     public UUID insert(DeviceDTO deviceDTO) {
         Device device = DeviceBuilder.toEntity(deviceDTO);
         device = deviceRepository.save(device);
+
+        // Send sync message to MonitoringService
+        DeviceSyncDTO syncDTO = new DeviceSyncDTO(
+                device.getDeviceId(),
+                device.getName(),
+                device.getSerialNumber(),
+                device.getMaxConsumption(),
+                device.getUserId(),
+                "CREATE"
+        );
+        messageProducer.sendDeviceSync(syncDTO);
+
         LOGGER.debug("Device with id {} was inserted in db", device.getDeviceId());
         return device.getDeviceId();
     }
 
+    @Transactional
     public void deleteById(UUID id) {
         if (!deviceRepository.existsById(id)) {
             LOGGER.error("Device with id {} was not found in db", id);
             throw new ResourceNotFoundException(Device.class.getSimpleName() + " with id: " + id);
         }
-
+        Device device = deviceRepository.findById(id).get();
         deviceRepository.deleteById(id);
+
+        // Send sync message to MonitoringService
+        DeviceSyncDTO syncDTO = new DeviceSyncDTO(
+                device.getDeviceId(),
+                device.getName(),
+                device.getSerialNumber(),
+                device.getMaxConsumption(),
+                device.getUserId(),
+                "DELETE"
+        );
+        messageProducer.sendDeviceSync(syncDTO);
         LOGGER.info("Device with id {} has been deleted successfully", id);
     }
 
@@ -79,6 +108,20 @@ public class DeviceService {
             LOGGER.error("Device with user id {} was not found in db", id);
             throw new ResourceNotFoundException(Device.class.getSimpleName() + " with id: " + id);
         }
+        Optional<List<Device>> devices = deviceRepository.findByUserId(id);
+        for (Device device : devices.get()) {
+            // Send sync message to MonitoringService
+            DeviceSyncDTO syncDTO = new DeviceSyncDTO(
+                    device.getDeviceId(),
+                    device.getName(),
+                    device.getSerialNumber(),
+                    device.getMaxConsumption(),
+                    device.getUserId(),
+                    "DELETE"
+            );
+            messageProducer.sendDeviceSync(syncDTO);
+        }
+
         deviceRepository.deleteByUserId(id);
         LOGGER.info("Device with user id {} has been deleted successfully", id);
     }

@@ -72,6 +72,25 @@ services:
     networks:
       - app_network
 
+  db_monitoring:
+    image: postgres:15
+    container_name: db_monitoring
+    environment:
+      POSTGRES_DB: monitoring
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: SQLPostgres32
+    ports:
+      - "5436:5432"
+    volumes:
+      - monitoring_db_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # =====================
   # MICROSERVICES
   # =====================
@@ -85,6 +104,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db_user:5432/user_management
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: SQLPostgres32
+      CLOUDAMQP_URL: ${CLOUDAMQP_URL}
     depends_on:
       - db_user
     labels:
@@ -105,6 +125,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db_device:5432/device
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: SQLPostgres32
+      CLOUDAMQP_URL: ${CLOUDAMQP_URL}
     depends_on:
       - db_device
     labels:
@@ -125,6 +146,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db_auth:5432/authentication
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: SQLPostgres32
+      CLOUDAMQP_URL: ${CLOUDAMQP_URL}
     depends_on:
       - db_auth
     labels:
@@ -161,6 +183,32 @@ services:
     networks:
       - app_network
 
+  monitoring-service:
+    build:
+      context: ./MonitoringService/demo
+      dockerfile: Dockerfile
+    container_name: monitoring-service
+    depends_on:
+      db_monitoring:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db_monitoring:5432/monitoring
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=SQLPostgres32
+      - SERVER_PORT=8084
+      - CLOUDAMQP_URL=${CLOUDAMQP_URL}
+    ports:
+      - "8084:8084"
+    networks:
+      - app_network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8084/monitoring/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 
 # =====================
 # VOLUMES & NETWORK
@@ -170,6 +218,7 @@ volumes:
   user_data:
   device_data:
   auth_data:
+  monitoring_db_data:
 
 networks:
   app_network:

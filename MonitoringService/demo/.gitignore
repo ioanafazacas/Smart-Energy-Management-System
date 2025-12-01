@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+# Environment variables
+.env
+
+# Application properties with credentials (if you use them)
+**/application-local.properties
