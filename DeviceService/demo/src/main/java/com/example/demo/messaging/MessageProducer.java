@@ -19,31 +19,11 @@ public class MessageProducer {
     @Value("${rabbitmq.exchange.device}")
     private String exchangeName;
 
-    @Value("${rabbitmq.routing.key.measurement}")
-    private String measurementRoutingKey;
-
     @Value("${rabbitmq.routing.key.sync}")
     private String syncRoutingKey;
 
     public MessageProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
-    }
-
-    /**
-     * Send device measurement to MonitoringService
-     */
-    public void sendMeasurement(DeviceMeasurementDTO measurement) {
-        try {
-            LOGGER.info("📤 Sending measurement to RabbitMQ: deviceId={}, value={}",
-                    measurement.getDeviceId(), measurement.getMeasurementValue());
-
-            rabbitTemplate.convertAndSend(exchangeName, measurementRoutingKey, measurement);
-
-            LOGGER.info("✅ Measurement sent successfully");
-        } catch (Exception e) {
-            LOGGER.error("❌ Error sending measurement to RabbitMQ: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to send measurement to queue", e);
-        }
     }
 
     /**

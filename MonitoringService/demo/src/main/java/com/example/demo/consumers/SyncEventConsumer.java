@@ -1,7 +1,7 @@
 package com.example.demo.consumers;
 
 
-import com.example.demo.dtos.SyncEventDTO;
+import com.example.demo.dtos.DeviceSyncDTO;
 import com.example.demo.services.SyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +22,11 @@ public class SyncEventConsumer {
     }
 
     @RabbitListener(queues = "device-sync-queue")
-    public void consumeSyncEvent(SyncEventDTO event) {
+    public void consumeSyncEvent(DeviceSyncDTO event) {
         try {
             LOGGER.info("🔄 Received sync event: type={}, entityId={}",
-                    event.getEventType(),
-                    event.getEntityId());
+                    event.getOperation(),
+                    event.getDeviceId());
 
             syncService.handleSyncEvent(event);
 

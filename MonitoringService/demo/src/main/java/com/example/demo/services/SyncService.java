@@ -1,10 +1,9 @@
 package com.example.demo.services;
 
 
-import com.example.demo.dtos.SyncEventDTO;
+import com.example.demo.dtos.DeviceSyncDTO;
 import com.example.demo.entities.DeviceInfo;
 import com.example.demo.repositories.DeviceInfoRepository;
-import com.example.demo.services.SyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -20,27 +19,23 @@ public class SyncService {
         this.deviceRepository = deviceRepository;
     }
 
-    public void handleSyncEvent(SyncEventDTO event) {
-        LOGGER.info("📩 Handling sync event: {}", event.getEventType());
+    public void handleSyncEvent(DeviceSyncDTO event) {
+        LOGGER.info("📩 Handling sync event: {}", event.getOperation());
 
-        switch (event.getEventType()) {
+        switch (event.getOperation()) {
 
-            case "DEVICE_CREATED" -> handleDeviceCreated(event);
-            case "DEVICE_DELETED" -> handleDeviceDeleted(event);
+            case "CREATE" -> handleDeviceCreated(event);
+            case "DELETE" -> handleDeviceDeleted(event);
 
-            // Optional depending on your architecture
-            case "USER_CREATED" -> handleUserCreated(event);
-            case "USER_DELETED" -> handleUserDeleted(event);
-
-            default -> LOGGER.warn("⚠️ Unknown sync event: {}", event.getEventType());
+            default -> LOGGER.warn("⚠️ Unknown sync event: {}", event.getOperation());
         }
     }
 
-    private void handleDeviceCreated(SyncEventDTO event) {
-        LOGGER.info("🟢 Creating device locally for monitoring: {}", event.getEntityId());
+    private void handleDeviceCreated(DeviceSyncDTO event) {
+        LOGGER.info("🟢 Creating device locally for monitoring: {}", event.getDeviceId());
 
         DeviceInfo device = new DeviceInfo();
-        device.setDeviceId(event.getEntityId());
+        device.setDeviceId(event.getDeviceId());
         device.setUserId(event.getUserId());
         device.setDeviceName(event.getDeviceName());
         device.setMaxConsumption(event.getMaxConsumption());
@@ -48,17 +43,17 @@ public class SyncService {
         deviceRepository.save(device);
     }
 
-    private void handleDeviceDeleted(SyncEventDTO event) {
-        LOGGER.info("🔴 Removing device from monitoring DB: {}", event.getEntityId());
-        deviceRepository.deleteById(event.getEntityId());
+    private void handleDeviceDeleted(DeviceSyncDTO event) {
+        LOGGER.info("🔴 Removing device from monitoring DB: {}", event.getDeviceId());
+        deviceRepository.deleteById(event.getDeviceId());
     }
 
-    private void handleUserCreated(SyncEventDTO event) {
+    private void handleUserCreated(DeviceSyncDTO event) {
         LOGGER.info("🟢 Received USER_CREATED — usually ignored by monitoring.");
         // optional: sync local user table
     }
 
-    private void handleUserDeleted(SyncEventDTO event) {
+    private void handleUserDeleted(DeviceSyncDTO event) {
         LOGGER.info("🔴 USER_DELETED event received — removing devices of user");
         deviceRepository.deleteByUserId(event.getUserId());
     }
