@@ -45,12 +45,12 @@ public class DeviceDataConsumer {
             );
             monitoringService.processMeasurement(measurement);
 
-            // 2️⃣ Trimite către WebSocketService
-            restTemplate.postForObject(
-                    "http://websocket-service:8085/push/measurement",
-                    measurement,
-                    Void.class
-            );
+//            // 2️⃣ Trimite către WebSocketService
+//            restTemplate.postForObject(
+//                    "http://websocket-service:8085/push/measurement",
+//                    measurement,
+//                    Void.class
+//            );
 
         } catch (Exception e) {
             LOGGER.error("❌ Error processing device measurement: {}", e.getMessage(), e);

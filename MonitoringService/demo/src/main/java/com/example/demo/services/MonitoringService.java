@@ -6,6 +6,7 @@ import com.example.demo.dtos.HourlyConsumptionDTO;
 import com.example.demo.entities.DeviceInfo;
 import com.example.demo.entities.DeviceMeasurement;
 import com.example.demo.entities.HourlyEnergyConsumption;
+import com.example.demo.publisher.OverconsumptionPublisher;
 import com.example.demo.repositories.DeviceInfoRepository;
 import com.example.demo.repositories.DeviceMeasurementRepository;
 import com.example.demo.repositories.HourlyEnergyConsumptionRepository;
@@ -32,14 +33,16 @@ public class MonitoringService {
     private final DeviceMeasurementRepository measurementRepository;
     private final HourlyEnergyConsumptionRepository hourlyConsumptionRepository;
     private final DeviceInfoRepository deviceInfoRepository;
+    private final OverconsumptionPublisher overconsumptionPublisher;
 
     @Autowired
     public MonitoringService(DeviceMeasurementRepository measurementRepository,
                              HourlyEnergyConsumptionRepository hourlyConsumptionRepository,
-                             DeviceInfoRepository deviceInfoRepository) {
+                             DeviceInfoRepository deviceInfoRepository, OverconsumptionPublisher overconsumptionPublisher) {
         this.measurementRepository = measurementRepository;
         this.hourlyConsumptionRepository = hourlyConsumptionRepository;
         this.deviceInfoRepository = deviceInfoRepository;
+        this.overconsumptionPublisher = overconsumptionPublisher;
     }
 
     @Transactional
@@ -87,6 +90,16 @@ public class MonitoringService {
             hourly = existingOpt.get();
             hourly.setTotalConsumption(hourly.getTotalConsumption() + measurementValue);
             hourly.setExceeded(hourly.getTotalConsumption() > maxConsumption);
+
+            if (hourly.getTotalConsumption() > maxConsumption) {
+                overconsumptionPublisher.publish(
+                        deviceId,
+                        hourly.getTotalConsumption(),
+                        maxConsumption
+                );
+            }
+
+
             LOGGER.info("📈 Updated hourly consumption for device {} at {}: total={}",
                     deviceId, hourTimestamp, hourly.getTotalConsumption());
         } else {

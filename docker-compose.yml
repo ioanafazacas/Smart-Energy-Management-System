@@ -219,8 +219,8 @@ services:
     ports:
       - "8085:8085"
     environment:
-      - INSTANCE_ID=ws
-      - CLOUDAMQP_URL=${CLOUDAMQP_URL}
+      INSTANCE_ID: ws
+      SPRING_RABBITMQ_ADDRESSES: ${CLOUDAMQP_URL}
     networks:
       - app_network
 

@@ -27,6 +27,10 @@ public class RabbitMQConfig {
 
     public static final String SYNC_ROUTING_KEY = "sync.event";
 
+    public static final String DEVICE_EXCHANGE = "device-exchange";
+    public static final String NOTIFICATION_QUEUE = "synchronization-notification-queue";
+    public static final String NOTIFICATION_ROUTING_KEY = "device.notification.overconsumption";
+
 
     @Bean
     public Queue monitoringIngestQueue() {
@@ -49,6 +53,24 @@ public class RabbitMQConfig {
 //        return QueueBuilder.durable(SYNC_QUEUE)
 //                .build();
 //    }
+
+    @Bean
+    public TopicExchange deviceExchange() {
+        return new TopicExchange(DEVICE_EXCHANGE, true, false);
+    }
+
+    @Bean
+    public Queue notificationQueue() {
+        return QueueBuilder.durable(NOTIFICATION_QUEUE).build();
+    }
+
+    @Bean
+    public Binding notificationBinding() {
+        return BindingBuilder
+                .bind(notificationQueue())
+                .to(deviceExchange())
+                .with(NOTIFICATION_ROUTING_KEY);
+    }
 
     @Bean
     public TopicExchange syncExchange() {
