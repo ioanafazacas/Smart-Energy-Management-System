@@ -7,9 +7,9 @@ import { createRoot } from 'react-dom/client';
 
 window.global = window;
 
-createRoot(document.getElementById('root')).render(<App />);
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+root.render(
   <React.StrictMode>
     <AuthProvider>
       <App />

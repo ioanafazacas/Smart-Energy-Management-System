@@ -4,7 +4,8 @@ import { Client } from '@stomp/stompjs';
 let stompClient = null;
 
 export const connectChat = (userId, onMessageReceived) => {
-  const socket = new SockJS('http://localhost/chat-websocket');
+  const socket = new SockJS('http://websocket.localhost/chat-websocket');
+
 
   stompClient = new Client({
     webSocketFactory: () => socket,

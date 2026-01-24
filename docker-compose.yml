@@ -223,27 +223,41 @@ services:
       SPRING_RABBITMQ_ADDRESSES: ${CLOUDAMQP_URL}
     networks:
       - app_network
-
-#  customer-support:
-#    build:
-#      context: ./CustomerSupportService/demo
-#    container_name: customer-support
-#    environment:
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://db_user:5432/user_management  # dacă stochează chat-uri în aceeași DB
-#      SPRING_DATASOURCE_USERNAME: postgres
-#      SPRING_DATASOURCE_PASSWORD: SQLPostgres32
-#      CLOUDAMQP_URL: ${CLOUDAMQP_URL}   # dacă folosește RabbitMQ
-#    depends_on:
-#      - db_user
-#      - websocket-service
 #    labels:
 #      - "traefik.enable=true"
-#      - "traefik.http.routers.customer-support.rule=Host(`support.localhost`)"
-#      - "traefik.http.services.customer-support.loadbalancer.server.port=8080"
-#      - "traefik.http.routers.customer-support.entrypoints=web"
-#      - "traefik.http.routers.customer-support.middlewares=cors@file"
-#    networks:
-#      - app_network
+#
+#      # 🔥 HOST pentru WebSocket
+#      - "traefik.http.routers.websocket.rule=Host(`websocket.localhost`)"
+#
+#      # 🔥 Portul intern al containerului
+#      - "traefik.http.services.websocket.loadbalancer.server.port=8085"
+#
+#      # 🔥 EntryPoint
+#      - "traefik.http.routers.websocket.entrypoints=web"
+#
+#      # 🔥 CORS
+#      - "traefik.http.routers.websocket.middlewares=cors@file"
+
+  customer-support:
+    build:
+      context: ./CustomerSupportService/demo
+    container_name: customer-support
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db_user:5432/user_management  # dacă stochează chat-uri în aceeași DB
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: SQLPostgres32
+      CLOUDAMQP_URL: ${CLOUDAMQP_URL}   # dacă folosește RabbitMQ
+    depends_on:
+      - db_user
+      - websocket-service
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.customer-support.rule=Host(`support.localhost`)"
+      - "traefik.http.services.customer-support.loadbalancer.server.port=8080"
+      - "traefik.http.routers.customer-support.entrypoints=web"
+      - "traefik.http.routers.customer-support.middlewares=cors@file"
+    networks:
+      - app_network
 
 
 

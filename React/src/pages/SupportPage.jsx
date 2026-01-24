@@ -1,8 +1,12 @@
-import ChatWidget from '../components/chat/ChatWidget';
 import { useAuth } from '../context/AuthContext';
+import ChatWidget from '../components/chat/ChatWidget';
 
 const SupportPage = () => {
   const { user } = useAuth();
+
+  if (!user) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <div>
